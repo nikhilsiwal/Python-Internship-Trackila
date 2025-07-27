@@ -1,0 +1,68 @@
+import sys
+
+tasks = []
+
+def show_tasks():
+    print("\nTo-Do List:")
+    if not tasks:
+        print("No tasks yet.")
+    for i in range(len(tasks)):
+        task, done = tasks[i]
+        status = "Completed" if done else "Not Completed"
+        print(f"{i+1}. [{status}] {task}")
+    print()
+
+def add_task():
+    task = input("Enter new task: ").strip()
+    if task:
+        tasks.append((task, False))
+        print("Task added!\n")
+    else:
+        print("Task cannot be empty.\n")
+
+def complete_task():
+    show_tasks()
+    position = input("Enter task number to mark as done: ")
+    if position.isdigit():
+        position = int(position) - 1
+        if 0 <= position < len(tasks):
+            tasks[position] = (tasks[position][0], True)
+            print("Task is marked as done!\n")
+        else:
+            print("Invalid task number.\n")
+    else:
+        print("Please enter a valid number.\n")
+
+def delete_task():
+    show_tasks()
+    position = input("Enter task number to delete: ")
+    if position.isdigit():
+        position = int(position) - 1
+        if 0 <= position < len(tasks):
+            tasks.pop(position)
+            print("Task deleted!\n")
+        else:
+            print("Invalid task number.\n")
+    else:
+        print("Please enter a valid number.\n")
+
+def main():
+    while True:
+        print("1. Show tasks\n2. Add task\n3. Complete task\n4. Delete task\n5. Exit")
+        choice = input("Choose an option: ")
+        if choice == "1":
+            show_tasks()
+        elif choice == "2":
+            add_task()
+        elif choice == "3":
+            complete_task()
+        elif choice == "4":
+            delete_task()
+        elif choice == "5":
+            print("See You Soon")
+            sys.exit()
+        else:
+            print("Invalid option.\n")
+
+if __name__ == "__main__":
+    main()
