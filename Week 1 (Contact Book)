@@ -1,0 +1,114 @@
+import json
+import os
+
+class ContactManager:
+    def __init__(self, filename="contacts.json"):
+        self.filename = filename
+        self.contacts = self.load_contacts()
+
+    def load_contacts(self):
+        """Load contacts from JSON file."""
+        if os.path.exists(self.filename):
+            try:
+                with open(self.filename, 'r') as file:
+                    return json.load(file)
+            except json.JSONDecodeError:
+                print("Error reading JSON file. Starting with empty contacts.")
+                return []
+        return []
+
+    def save_contacts(self):
+        """Save contacts to JSON file."""
+        try:
+            with open(self.filename, 'w') as file:
+                json.dump(self.contacts, file, indent=4)
+            print("Contacts saved successfully.")
+        except Exception as e:
+            print(f"Error saving contacts: {str(e)}")
+
+    def add_contact(self, name, phone, email):
+        """Add a new contact."""
+        contact = {"name": name, "phone": phone, "email": email}
+        self.contacts.append(contact)
+        self.save_contacts()
+        print(f"Added contact: {name}")
+
+    def update_contact(self, identifier, field, new_value):
+        """Update a contact's field by name or phone."""
+        for contact in self.contacts:
+            if contact["name"].lower() == identifier.lower() or contact["phone"] == identifier:
+                contact[field] = new_value
+                self.save_contacts()
+                print(f"Updated {field} for {contact['name']}")
+                return
+        print("Contact not found.")
+
+    def delete_contact(self, identifier):
+        """Delete a contact by name or phone."""
+        for i, contact in enumerate(self.contacts):
+            if contact["name"].lower() == identifier.lower() or contact["phone"] == identifier:
+                deleted_contact = self.contacts.pop(i)
+                self.save_contacts()
+                print(f"Deleted contact: {deleted_contact['name']}")
+                return
+        print("Contact not found.")
+
+    def search_contact(self, identifier):
+        """Search for contacts by name or phone."""
+        results = []
+        for contact in self.contacts:
+            if (identifier.lower() in contact["name"].lower() or 
+                identifier in contact["phone"]):
+                results.append(contact)
+        return results
+
+def main():
+    manager = ContactManager()
+
+    while True:
+        print("\nContact Manager")
+        print("1. Add contact")
+        print("2. Update contact")
+        print("3. Delete contact")
+        print("4. Search contact")
+        print("5. Exit")
+
+        choice = input("Enter choice (1-5): ")
+
+        if choice == "1":
+            name = input("Enter name: ")
+            phone = input("Enter phone: ")
+            email = input("Enter email: ")
+            manager.add_contact(name, phone, email)
+
+        elif choice == "2":
+            identifier = input("Enter name or phone to update: ")
+            field = input("Enter field to update (name/phone/email): ")
+            if field not in ["name", "phone", "email"]:
+                print("Invalid field!")
+                continue
+            new_value = input(f"Enter new {field}: ")
+            manager.update_contact(identifier, field, new_value)
+
+        elif choice == "3":
+            identifier = input("Enter name or phone to delete: ")
+            manager.delete_contact(identifier)
+
+        elif choice == "4":
+            identifier = input("Enter name or phone to search: ")
+            results = manager.search_contact(identifier)
+            if results:
+                for contact in results:
+                    print(f"Name: {contact['name']}, Phone: {contact['phone']}, Email: {contact['email']}")
+            else:
+                print("No contacts found.")
+
+        elif choice == "5":
+            print("Exiting...")
+            break
+
+        else:
+            print("Invalid choice!")
+
+if __name__ == "__main__":
+    main()
