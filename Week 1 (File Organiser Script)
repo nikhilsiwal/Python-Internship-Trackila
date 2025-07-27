@@ -1,0 +1,59 @@
+import os
+import shutil
+
+def sort_files(directory):
+    # Ensures that the directory exists
+    if not os.path.exists(directory):
+        print(f"Directory '{directory}' does not exist.")
+        return
+
+    # Get all files in the directory
+    for filename in os.listdir(directory):
+        # It helps us to skip directories
+        if os.path.isdir(os.path.join(directory, filename)):
+            continue
+
+        # Get file extension
+        file_ext = os.path.splitext(filename)[1].lower()
+
+        # It skip files without any extension
+        if not file_ext:
+            continue
+
+        # Remove the dot from extension
+        file_ext = file_ext[1:] if file_ext else 'no_extension'
+
+        # Create destination for folder path
+        dest_folder = os.path.join(directory, file_ext)
+
+        # Create a folder if it doesn't exist
+        if not os.path.exists(dest_folder):
+            os.makedirs(dest_folder)
+
+        # Source and destination paths
+        src_path = os.path.join(directory, filename)
+        dest_path = os.path.join(dest_folder, filename)
+
+        try:
+            # Checks if destination file already exists
+            if os.path.exists(dest_path):
+                # Add number suffix to avoid overwriting
+                base, ext = os.path.splitext(filename)
+                counter = 1
+                while os.path.exists(dest_path):
+                    new_filename = f"{base}_{counter}{ext}"
+                    dest_path = os.path.join(dest_folder, new_filename)
+                    counter += 1
+
+            # Move the file
+            shutil.move(src_path, dest_path)
+            print(f"Moved '{filename}' to '{dest_folder}'")
+
+        except Exception as e:
+            print(f"Error moving '{filename}': {str(e)}")
+
+if __name__ == "__main__":
+    # Specify the directory to sort (otherwise current directory will sort by default)
+    target_directory = os.getcwd()
+    print(f"Sorting files in: {target_directory}")
+    sort_files(target_directory)
